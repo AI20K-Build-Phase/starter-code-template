@@ -1,0 +1,21 @@
+# Environment
+.env
+
+# TypeScript
+node_modules/
+dist/
+*.js.map
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+build/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# OS
+.DS_Store
