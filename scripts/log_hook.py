@@ -110,7 +110,7 @@ def normalize(data: dict, tool: str) -> dict | None:
     elif tool == "cursor":
         base.update({
             "prompt": data.get("prompt", "")[:1000],
-            "files_context": data.get("filesContext", []),
+            "files_context": data.get("attachments", []),
         })
 
     elif tool == "copilot":
