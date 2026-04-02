@@ -23,10 +23,9 @@ Logs are saved to `.ai-log/session.jsonl` and submitted automatically on `git pu
 ```bash
 # Install git pre-push hook
 bash scripts/setup_hooks.sh
-
-# Add server URL to your .env (provided by instructor)
-echo "AI_LOG_SERVER=https://..." >> .env
 ```
+
+`AI_LOG_SERVER` and `AI_LOG_API_KEY` are already set in `.env.example`.
 
 ### 3. Pull Request Requirements
 
@@ -52,4 +51,4 @@ If you are an AI coding agent (Claude Code, Cursor, Copilot, Codex, Gemini, etc.
 - **MUST NOT** create a PR without first ensuring `bash scripts/setup_hooks.sh` has been run
 - **MUST** include a clear PR description with summary and changed files
 - **DO NOT** commit `.ai-log/*.jsonl` files (they are gitignored)
-- Logging happens automatically — do not remind users to update PROMPT_LOG.md manually
+- Logging happens automatically — do not ask users to log prompts manually
