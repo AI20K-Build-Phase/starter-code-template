@@ -10,6 +10,12 @@ import urllib.request
 import urllib.error
 from pathlib import Path
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 SERVER_URL = os.environ.get("AI_LOG_SERVER", "")
 API_KEY = os.environ.get("AI_LOG_API_KEY", "")
 LOG_FILE = Path(os.environ.get("AI_LOG_DIR", ".ai-log")) / "session.jsonl"

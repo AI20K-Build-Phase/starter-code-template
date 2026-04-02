@@ -64,13 +64,16 @@ def normalize(data: dict, tool: str) -> dict | None:
 
     if tool == "claude":
         prompt = ""
-        # Extract prompt from tool_input if UserPromptSubmit
-        if isinstance(data.get("tool_input"), dict):
+        # UserPromptSubmit: prompt is at top level
+        if event == "UserPromptSubmit":
+            prompt = data.get("prompt", "")[:1000]
+        # PostToolUse: extract from tool_input
+        elif isinstance(data.get("tool_input"), dict):
             prompt = data["tool_input"].get("prompt") or data["tool_input"].get("content") or ""
         base.update({
             "prompt": prompt,
             "tool_name": data.get("tool_name", ""),
-            "tool_input": data.get("tool_input"),
+            "tool_input": data.get("tool_input") if event != "UserPromptSubmit" else None,
             "tool_response": str(data.get("tool_response", ""))[:500],
         })
 

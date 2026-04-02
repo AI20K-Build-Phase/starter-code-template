@@ -1,5 +1,15 @@
 {
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "AI_TOOL_NAME=claude python3 scripts/log_hook.py"
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": ".*",
