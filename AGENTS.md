@@ -2,55 +2,54 @@
 
 ## Mandatory Rules When Using AI Coding Agents
 
-### 1. Record Your Prompt Log
+### 1. AI Prompt Logging (Automatic)
 
-**Every time you create a Pull Request, you MUST record all prompts you used.**
+Prompts are **automatically logged** via hooks when you use any supported AI tool.
+You do **not** need to manually update `PROMPT_LOG.md`.
 
-Create or update the `PROMPT_LOG.md` file in the root directory with this format:
+Supported tools and their hook configs:
+| Tool | Config file |
+|---|---|
+| Claude Code | `.claude/settings.json` |
+| Cursor | `.cursor/hooks.json` |
+| OpenAI Codex | `.codex/hooks.json` |
+| Gemini CLI | `.gemini/settings.json` |
+| GitHub Copilot | `.github/hooks/hooks.json` |
 
-```markdown
-## PR #<number>: <title>
+Logs are saved to `.ai-log/session.jsonl` and submitted automatically on `git push`.
 
-### Prompt 1
-> <the prompt you sent to the AI agent>
+### 2. Setup (One-time)
 
-**Result:** <brief description of what the AI did>
+```bash
+# Install git pre-push hook
+bash scripts/setup_hooks.sh
 
-### Prompt 2
-> <next prompt>
-
-**Result:** <brief description>
-
-...
+# Add server URL to your .env (provided by instructor)
+echo "AI_LOG_SERVER=https://..." >> .env
 ```
 
-### 2. Pull Request Requirements
+### 3. Pull Request Requirements
 
 - **Title**: Short description of the change
 - **Description**: Must include:
   - Summary of changes
-  - Number of prompts used
-  - Link to the corresponding section in `PROMPT_LOG.md`
-- **PROMPT_LOG.md**: Must be updated in the same PR
+  - List of changed files
 
-### 3. Rules for AI Agents
-
-If you are an AI coding agent (Claude Code, Cursor, GitHub Copilot, etc.):
-
-- **DO NOT** create a PR without a prompt log
-- **MUST** automatically remind the user to record prompts if they forget
-- **MUST** add a new section to `PROMPT_LOG.md` before committing
-- **MUST** include the total number of prompts in the PR description
-- PR description format:
+PR description format:
 
 ```
 ## Summary
 <description of changes>
 
-## Prompt Log
-- Total prompts: <count>
-- See: [PROMPT_LOG.md](./PROMPT_LOG.md#pr-<number>)
-
 ## Changes
 - <list of changed files>
 ```
+
+### 4. Rules for AI Agents
+
+If you are an AI coding agent (Claude Code, Cursor, Copilot, Codex, Gemini, etc.):
+
+- **MUST NOT** create a PR without first ensuring `bash scripts/setup_hooks.sh` has been run
+- **MUST** include a clear PR description with summary and changed files
+- **DO NOT** commit `.ai-log/*.jsonl` files (they are gitignored)
+- Logging happens automatically — do not remind users to update PROMPT_LOG.md manually
