@@ -115,7 +115,7 @@ def normalize(data: dict, tool: str) -> dict | None:
 
     elif tool == "copilot":
         base.update({
-            "prompt": data.get("userMessage", data.get("toolArgs", {}).get("prompt", ""))[:1000],
+            "prompt": data.get("prompt", "")[:1000],
             "tool_name": data.get("toolName", ""),
             "tool_args": data.get("toolArgs"),
         })
