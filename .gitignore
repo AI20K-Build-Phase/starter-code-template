@@ -1,11 +1,6 @@
 # Environment
 .env
 
-# TypeScript
-node_modules/
-dist/
-*.js.map
-
 # Python
 __pycache__/
 *.py[cod]

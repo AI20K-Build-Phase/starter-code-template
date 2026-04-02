@@ -1,32 +1,23 @@
 # Starter Code App
 
-A template for building AI Agents in **TypeScript** or **Python**. Pick your language and start building.
+A template for building AI Agents in Python.
 
 ## Structure
 
 ```
-├── typescript/             # TypeScript starter
-│   ├── src/
-│   │   ├── agent.ts        # Main agent loop
-│   │   ├── tools.ts        # Tool definitions
-│   │   └── config.ts       # Configuration
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── .env.example
-├── python/                 # Python starter
-│   ├── src/
-│   │   ├── agent.py        # Main agent loop
-│   │   ├── tools.py        # Tool definitions
-│   │   └── config.py       # Configuration
-│   ├── requirements.txt
-│   └── .env.example
+├── src/
+│   ├── agent.py        # Main agent loop
+│   ├── tools.py        # Tool definitions
+│   └── config.py       # Configuration
 ├── scripts/
-│   ├── setup_hooks.sh      # One-time hook installer
-│   ├── log_hook.py         # AI tool hook handler
-│   └── submit_log.py       # Submits logs on git push
-├── AGENTS.md               # Rules for using AI coding agents
-├── JOURNAL.md              # Weekly journal — product journey & learnings
-└── WORKLOG.md              # Technical decisions, task assignments, brainstorming
+│   ├── setup_hooks.sh  # One-time hook installer
+│   ├── log_hook.py     # AI tool hook handler
+│   └── submit_log.py   # Submits logs on git push
+├── requirements.txt
+├── .env.example
+├── AGENTS.md           # Rules for using AI coding agents
+├── JOURNAL.md          # Weekly journal — product journey & learnings
+└── WORKLOG.md          # Technical decisions, task assignments, brainstorming
 ```
 
 ## Getting Started
@@ -44,29 +35,14 @@ bash scripts/setup_hooks.sh
 ### 2. Configure environment
 
 ```bash
-# TypeScript
-cd typescript && cp .env.example .env
-
-# Python
-cd python && cp .env.example .env
+cp .env.example .env
 ```
 
-Open `.env` and fill in your `ANTHROPIC_API_KEY` (or `OPENAI_API_KEY`). The `AI_LOG_*` variables are pre-filled.
+Open `.env` and fill in your `ANTHROPIC_API_KEY`. The `AI_LOG_*` variables are pre-filled.
 
 ### 3. Run
 
-**TypeScript**
 ```bash
-cd typescript
-npm install
-npm start
-# or dev mode:
-npm run dev
-```
-
-**Python**
-```bash
-cd python
 python -m venv venv
 source venv/bin/activate       # Linux/Mac
 # or: venv\Scripts\activate    # Windows
