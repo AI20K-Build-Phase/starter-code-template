@@ -1,5 +1,17 @@
 {
   "hooks": {
+    "BeforeAgent": [
+      {
+        "hooks": [
+          {
+            "name": "log-prompt",
+            "type": "command",
+            "command": "AI_TOOL_NAME=gemini python3 scripts/log_hook.py",
+            "timeout": 10000
+          }
+        ]
+      }
+    ],
     "AfterModel": [
       {
         "matcher": ".*",

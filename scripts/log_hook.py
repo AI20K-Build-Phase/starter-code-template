@@ -78,23 +78,27 @@ def normalize(data: dict, tool: str) -> dict | None:
         })
 
     elif tool == "gemini":
-        req = data.get("request", {})
-        contents = req.get("contents", [])
-        prompt = ""
-        for c in reversed(contents):
-            for part in c.get("parts", []):
-                if part.get("text"):
-                    prompt = part["text"][:1000]
+        if event == "BeforeAgent":
+            prompt = data.get("prompt", "")[:1000]
+            base.update({"prompt": prompt})
+        else:
+            req = data.get("request", {})
+            contents = req.get("contents", [])
+            prompt = ""
+            for c in reversed(contents):
+                for part in c.get("parts", []):
+                    if part.get("text"):
+                        prompt = part["text"][:1000]
+                        break
+                if prompt:
                     break
-            if prompt:
-                break
-        resp = data.get("response", {})
-        answer = ""
-        try:
-            answer = resp["candidates"][0]["content"]["parts"][0]["text"][:500]
-        except Exception:
-            pass
-        base.update({"prompt": prompt, "response_summary": answer})
+            resp = data.get("response", {})
+            answer = ""
+            try:
+                answer = resp["candidates"][0]["content"]["parts"][0]["text"][:500]
+            except Exception:
+                pass
+            base.update({"prompt": prompt, "response_summary": answer})
 
     elif tool == "codex":
         base.update({
