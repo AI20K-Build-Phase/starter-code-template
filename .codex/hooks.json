@@ -6,7 +6,7 @@
         "hooks": [
           {
             "name": "log-prompt",
-            "command": "AI_TOOL_NAME=codex python3 scripts/log_hook.py",
+            "command": "bash scripts/_pyrun.sh scripts/log_hook.py --tool=codex",
             "timeout": 10
           }
         ]
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "name": "log-stop",
-            "command": "AI_TOOL_NAME=codex python3 scripts/log_hook.py",
+            "command": "bash scripts/_pyrun.sh scripts/log_hook.py --tool=codex",
             "timeout": 10
           }
         ]

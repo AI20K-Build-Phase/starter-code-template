@@ -21,7 +21,16 @@ def git(cmd):
 
 
 def detect_tool(data: dict) -> str:
-    """Detect which AI tool sent this hook event."""
+    """Detect which AI tool sent this hook event.
+
+    Priority:
+      1. --tool=NAME CLI argument (cross-platform: works in cmd.exe, PowerShell, bash)
+      2. AI_TOOL_NAME env var (legacy, bash-only when set inline)
+      3. Heuristics from payload shape
+    """
+    for arg in sys.argv[1:]:
+        if arg.startswith("--tool="):
+            return arg.split("=", 1)[1].lower()
     tool_env = os.environ.get("AI_TOOL_NAME", "").lower()
     if tool_env:
         return tool_env

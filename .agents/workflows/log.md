@@ -4,21 +4,25 @@ description: "Ghi log sử dụng AI thủ công cho mọi tool (ChatGPT, Gemini
 
 # Ghi log AI thủ công
 
-Chạy lệnh sau để ghi log:
+Chạy lệnh sau để ghi log (cross-platform — wrapper tự dò Python):
 
-// turbo
-1. Chạy script ghi log tương tác (interactive mode):
+**Linux / macOS / Git Bash:**
 ```bash
-python scripts/log_manual.py
+# Interactive mode
+bash scripts/_pyrun.sh scripts/log_manual.py
+
+# One-line mode
+bash scripts/_pyrun.sh scripts/log_manual.py --tool "<tên tool>" --prompt "<mô tả việc đã làm>"
 ```
 
-Hoặc nếu muốn ghi nhanh (one-line):
-```bash
-python scripts/log_manual.py --tool "<tên tool>" --prompt "<mô tả việc đã làm>"
+**Windows (cmd.exe / PowerShell):**
+```cmd
+scripts\_pyrun.cmd scripts\log_manual.py
+scripts\_pyrun.cmd scripts\log_manual.py --tool "<tên tool>" --prompt "<mô tả việc đã làm>"
 ```
 
 Ví dụ:
 ```bash
-python scripts/log_manual.py --tool chatgpt --prompt "Brainstorm UI layout for verify page"
-python scripts/log_manual.py --tool gemini-web --prompt "Research risk scoring algorithms"
+bash scripts/_pyrun.sh scripts/log_manual.py --tool chatgpt --prompt "Brainstorm UI layout for verify page"
+bash scripts/_pyrun.sh scripts/log_manual.py --tool gemini-web --prompt "Research risk scoring algorithms"
 ```
