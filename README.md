@@ -10,14 +10,16 @@ A template for building AI Agents in Python.
 │   ├── tools.py        # Tool definitions
 │   └── config.py       # Configuration
 ├── scripts/
-│   ├── setup_hooks.sh  # One-time hook installer
-│   ├── log_hook.py     # AI tool hook handler
-│   └── submit_log.py   # Submits logs on git push
+│   ├── setup_hooks.sh        # One-time hook installer
+│   ├── log_hook.py           # AI tool hook handler (Claude / Cursor / Codex / Gemini)
+│   ├── log_antigravity.py    # Auto-log hook for Antigravity
+│   ├── log_manual.py         # Manual log for ChatGPT / web tools
+│   └── submit_log.py         # Submits logs on git push
+├── .agents/                  # Antigravity rules + workflows
 ├── requirements.txt
 ├── .env.example
-├── AGENTS.md           # Rules for using AI coding agents
-├── JOURNAL.md          # Weekly journal — product journey & learnings
-└── WORKLOG.md          # Technical decisions, task assignments, brainstorming
+├── JOURNAL.md                # Weekly journal — product journey & learnings
+└── WORKLOG.md                # Technical decisions, task assignments, brainstorming
 ```
 
 ## Getting Started
@@ -76,6 +78,10 @@ See each file for the format and examples.
 
 ## AI Logging
 
-Prompts and tool calls are **automatically logged** when you use any supported AI tool (Claude Code, Cursor, Codex, Gemini, Copilot). No manual steps needed after running `setup_hooks.sh`.
+Prompts and tool calls are **automatically logged** when you use any supported AI tool (Claude Code, Cursor, Codex, Gemini, Antigravity, Copilot). No manual steps needed after running `setup_hooks.sh`.
 
-See [AGENTS.md](./AGENTS.md) for details.
+For ChatGPT or other web tools, log manually with:
+
+```bash
+python scripts/log_manual.py --tool chatgpt --prompt "<what you did>"
+```
