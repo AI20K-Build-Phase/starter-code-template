@@ -21,7 +21,7 @@ Khi tham gia AI20K Build Phase, mỗi đội cần xây dựng một AI Agent ho
 
 ```bash
 # Clone template
-git clone https://github.com/AI20K-Build-Cohort-2/starter-code-template.git team-YOUR_TEAM_NAME
+git clone https://github.com/AI20K-Build-Phase/starter-code-template.git team-YOUR_TEAM_NAME
 cd team-YOUR_TEAM_NAME
 
 # Xóa git history cũ và khởi tạo lại
@@ -196,6 +196,17 @@ bất kỳ markdown viewer/editor nào (VS Code, Obsidian, GitHub UI, …).
 - 🏫 **AI20K Program:** VinUni AI20K Build Phase
 - 👨‍🏫 **Mentor:** Đặng Hải Lộc
 
+## 🤝 Đóng góp
+
+Repo này là open-source. Xem [CONTRIBUTING.md](CONTRIBUTING.md) trước khi mở PR.
+
+Lưu ý: nội dung trong `docs/guide/` là nguồn của Technical Book và được đồng bộ
+lên [phoenix.note.transformerlabs.ai/technical-book](https://phoenix.note.transformerlabs.ai/technical-book).
+Mọi thay đổi ở đó cần review của [@AI20K-Build-Phase/book-maintainers](https://github.com/orgs/AI20K-Build-Phase/teams/book-maintainers)
+— xem [.github/CODEOWNERS](.github/CODEOWNERS).
+
+Báo lỗ hổng bảo mật: [SECURITY.md](SECURITY.md) (đừng mở public issue).
+
 ## 📄 License
 
-MIT — Sử dụng tự do cho mục đích giáo dục.
+[MIT](LICENSE) — Sử dụng tự do cho mục đích giáo dục.
