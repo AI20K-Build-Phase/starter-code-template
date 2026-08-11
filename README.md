@@ -183,7 +183,7 @@ bash scripts/_pyrun.sh scripts/log_manual.py --tool chatgpt --prompt "What you a
 
 **Online (khuyến nghị):** [phoenix.note.transformerlabs.ai/technical-book](https://phoenix.note.transformerlabs.ai/technical-book)
 
-Đăng nhập bằng GitHub (cùng account đã được BTC mời vào org `AI20K-Build-Cohort-2`)
+Đăng nhập bằng GitHub (cùng account đã được BTC mời vào org `AI20K-Build-Phase`)
 → chọn tab **Technical Book** ở sidebar trái → đọc 10 chương + topic sections,
 có table of contents bên phải, hỗ trợ light/dark/cyberpunk theme.
 
