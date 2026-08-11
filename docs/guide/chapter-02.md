@@ -15,7 +15,7 @@ Mở terminal và chạy các lệnh sau:
 
 ```bash
 # Thay XXX bằng số thứ tự đội của bạn (ví dụ: C2-App-001, C2-App-042)
-$ git clone https://github.com/AI20K-Build-Cohort-2/starter-code-template.git C2-App-XXX
+$ git clone https://github.com/AI20K-Build-Phase/starter-code-template.git C2-App-XXX
 
 # Di chuyển vào thư mục dự án
 $ cd C2-App-XXX
