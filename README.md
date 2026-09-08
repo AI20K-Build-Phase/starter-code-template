@@ -17,19 +17,20 @@ Khi tham gia AI20K Build Phase, mỗi đội cần xây dựng một AI Agent ho
 
 ## ⚡ Quick Start
 
-### Bước 1: Fork hoặc Clone
+### Bước 1: Clone repo của đội
+
+Khi đội được chốt, hệ thống tự sinh repo cho đội **từ template này**, nằm trong
+org GitHub của khoá bạn đang học và đặt tên theo mã đội. Copy URL ở trang đội
+trên Phoenix rồi clone về:
 
 ```bash
-# Clone template
-git clone https://github.com/AI20K-Build-Phase/starter-code-template.git team-YOUR_TEAM_NAME
-cd team-YOUR_TEAM_NAME
-
-# Xóa git history cũ và khởi tạo lại
-rm -rf .git
-git init
-git add .
-git commit -m "feat: khởi tạo dự án từ template"
+git clone https://github.com/<ORG-CỦA-KHOÁ>/<MÃ-ĐỘI>.git
+cd <MÃ-ĐỘI>
 ```
+
+Không cần `rm -rf .git`, `git init` hay `git remote add`: repo sinh từ template
+đã bắt đầu bằng lịch sử riêng của đội và remote trỏ sẵn đúng chỗ. Chưa thấy repo
+của đội thì báo BTC — repo tự tạo nằm ngoài org sẽ không được chấm.
 
 ### Bước 2: Setup môi trường
 
@@ -183,7 +184,7 @@ bash scripts/_pyrun.sh scripts/log_manual.py --tool chatgpt --prompt "What you a
 
 **Online (khuyến nghị):** [phoenix.note.transformerlabs.ai/technical-book](https://phoenix.note.transformerlabs.ai/technical-book)
 
-Đăng nhập bằng GitHub (cùng account đã được BTC mời vào org `AI20K-Build-Phase`)
+Đăng nhập bằng GitHub (cùng account đã được BTC mời vào org của khoá)
 → chọn tab **Technical Book** ở sidebar trái → đọc 10 chương + topic sections,
 có table of contents bên phải, hỗ trợ light/dark/cyberpunk theme.
 

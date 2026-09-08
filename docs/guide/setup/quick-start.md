@@ -6,11 +6,14 @@ weight: 1
 
 ## Quick Start Guide
 
-### Bước 1: Clone Template
+### Bước 1: Clone repo của đội
+
+Repo của đội đã được tạo sẵn từ template trong org GitHub của khoá — copy URL ở
+trang đội trên Phoenix rồi clone về:
 
 ```bash
-git clone https://github.com/AI20K-Build-Phase/starter-code-template.git C2-App-XXX
-cd C2-App-XXX
+git clone https://github.com/<ORG-CỦA-KHOÁ>/<MÃ-ĐỘI>.git
+cd <MÃ-ĐỘI>
 ```
 
 ### Bước 2: Environment Setup
@@ -41,8 +44,8 @@ uvicorn src.main:app --reload
 ### Bước 4: Git Setup
 
 ```bash
-# Đổi remote origin sang repo của team
-git remote set-url origin https://github.com/AI20K-Build-Cohort-2/C2-App-XXX.git
+# Xác nhận remote đã trỏ đúng repo của đội (repo cấp sẵn — không cần set-url)
+git remote -v
 
 # Tạo branch develop
 git checkout -b develop
@@ -54,7 +57,7 @@ git push -u origin develop
 ## Folder Structure
 
 ```
-C2-App-XXX/
+<MÃ-ĐỘI>/
 ├── src/                    ← Source code chính
 │   ├── agents/             ← LangGraph agents
 │   │   ├── graph.py        ← Graph definition

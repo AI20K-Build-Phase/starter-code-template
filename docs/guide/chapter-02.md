@@ -3,43 +3,44 @@ title: "Khởi tạo dự án từ Template"
 weight: 2
 ---
 
-## Clone template — Bắt đầu từ nền tảng đúng
+## Nhận repo của đội — Bắt đầu từ nền tảng đúng
 
 Một trong những sai lầm phổ biến nhất của sinh viên khi bắt đầu dự án mới là tạo mọi thứ từ con số không — tự setup cấu trúc thư mục, tự cấu hình linting, tự viết CI/CD file, tự tạo Dockerfile. Kết quả là mỗi đội có một cấu trúc khác nhau, thiếu những file quan trọng, và mất hàng ngày chỉ để setup thay vì viết logic chính. Template dự án giải quyết vấn đề này bằng cách cung cấp một nền tảng đã được chuẩn hóa, bao gồm tất cả best practices mà bạn cần.
 
-Trong AI20K, chúng tôi cung cấp sẵn một template repository với cấu trúc đã được kiểm chứng. Bạn chỉ cần clone, cấu hình, và bắt đầu code. Hãy cùng thực hiện từng bước.
+Trong AI20K bạn không phải tự clone template rồi tự tạo repository. Khi đội của bạn được chốt, hệ thống sinh sẵn một repo riêng cho đội **từ chính template này** — nằm trong org GitHub của khoá bạn đang học, đặt tên theo mã đội. Việc của bạn là clone nó về và bắt đầu code.
 
-### Clone repository
+### Trước khi clone, kiểm tra hai điều
+
+1. **Bạn đã vào org GitHub của khoá.** BTC gửi lời mời tới tài khoản GitHub bạn đã đăng ký; lời mời chưa được chấp nhận thì lệnh clone sẽ báo lỗi 404 (GitHub trả 404 chứ không phải 403 cho repo private mà bạn chưa có quyền). Kiểm tra tại [github.com/settings/organizations](https://github.com/settings/organizations).
+2. **Repo của đội đã được tạo.** Link repo hiện ở trang đội trên Phoenix, đồng thời có một tin nhắn báo trong kênh feed GitHub trên Discord ngay khi repo được sinh ra.
+
+Nếu chưa thấy repo của đội, **đừng tự tạo repo mới** — hãy báo BTC. Repo do đội tự tạo nằm ngoài org nên không bắn webhook về hệ thống chấm, và không được tính là bài nộp.
+
+### Clone repo của đội
 
 Mở terminal và chạy các lệnh sau:
 
 ```bash
-# Thay XXX bằng số thứ tự đội của bạn (ví dụ: C2-App-001, C2-App-042)
-$ git clone https://github.com/AI20K-Build-Phase/starter-code-template.git C2-App-XXX
+# Thay <ORG-CỦA-KHOÁ>/<MÃ-ĐỘI> bằng URL thật — copy ở trang đội trên Phoenix
+$ git clone https://github.com/<ORG-CỦA-KHOÁ>/<MÃ-ĐỘI>.git
 
 # Di chuyển vào thư mục dự án
-$ cd C2-App-XXX
+$ cd <MÃ-ĐỘI>
 
-# Xóa git history của template và khởi tạo lại
-$ rm -rf .git
-$ git init
-$ git add .
-$ git commit -m "feat: khởi tạo dự án từ template"
-
-# Đẩy lên repository của đội bạn
-$ git remote add origin https://github.com/AI20K-Build-Cohort-2/C2-App-XXX.git
-$ git branch -M main
-$ git push -u origin main
+# Xác nhận remote trỏ đúng repo của đội, không phải template
+$ git remote -v
 ```
 
-Tại sao phải xóa `.git` và khởi tạo lại? Vì template có lịch sử commit của chính template, bạn không muốn lịch sử đó lẫn vào dự án của mình. Bằng cách `rm -rf .git` và `git init`, bạn bắt đầu với một lịch sử sạch, commit đầu tiên ghi nhận ngày bạn bắt đầu dự án.
+Bạn **không** cần `rm -rf .git`, không cần `git init`, cũng không cần `git remote add`. Repo của đội được sinh bằng cơ chế *generate* của GitHub chứ không phải fork hay clone thủ công: nó bắt đầu bằng đúng một commit khởi tạo, lịch sử commit của template không đi theo. Thứ mà bước `rm -rf .git` ngày trước dùng để dọn dẹp thì nay không tồn tại.
+
+Ngược lại, xoá `.git` lúc này là tự phá dự án của mình: mất remote trỏ về GitHub, mất luôn branch `main` đang được bảo vệ, và lần push sau đó không còn chỗ để đẩy lên.
 
 ### Cấu trúc thư mục và ý nghĩa
 
 Sau khi clone, hãy mở thư mục dự án trong editor (khuyến nghị VS Code). Bạn sẽ thấy cấu trúc như sau:
 
 ```
-team-YOUR_TEAM_NAME/
+<MÃ-ĐỘI>/
 ├── src/
 │   ├── agent/           # LangGraph Agent logic
 │   │   ├── __init__.py
@@ -497,7 +498,7 @@ authors = [
 ]
 
 [project.urls]
-repository = "https://github.com/AI20K-Build-Cohort-2/C2-App-XXX"  # URL repo của bạn
+repository = "https://github.com/<ORG-CỦA-KHOÁ>/<MÃ-ĐỘI>"  # URL repo của đội bạn
 ```
 
 **2. Cập nhật `README.md`:** Template có README placeholder. Thay thế bằng nội dung thực tế:
@@ -544,7 +545,7 @@ OPENAI_API_KEY=sk-proj-xxxxxxxxxxxxx
 
 Sau khi hoàn thành tất cả các bước trong chương này, bạn nên có:
 
-1. Repository đã clone và push lên GitHub.
+1. Repo của đội đã clone về máy, `git remote -v` trỏ đúng org của khoá.
 2. Môi trường ảo đã setup, tất cả dependencies đã cài.
 3. File `.env` đã cấu hình với API key.
 4. Server chạy được trên localhost, Swagger UI accessible.
