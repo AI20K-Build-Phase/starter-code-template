@@ -546,7 +546,7 @@ src/agents/routing.py              12      0   100%
 TOTAL                            155     38    75%
 ```
 
-Cột "Missing" cho biết dòng nào chưa được test覆盖 — tập trung viết test cho những dòng này.
+Cột "Missing" cho biết dòng nào chưa được test — tập trung viết test cho những dòng này.
 
 ### Mục tiêu coverage cho AI20K
 
