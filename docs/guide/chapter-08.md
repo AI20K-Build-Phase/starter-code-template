@@ -29,7 +29,7 @@ from unittest.mock import AsyncMock, patch
 # --- Unit Test: test một hàm đơn lẻ ---
 def test_parse_message_valid_input():
     """Unit test: test hàm parse_message với input hợp lệ."""
-    from app.utils import parse_message
+    from src.utils import parse_message
 
     result = parse_message('{"message": "Xin chào", "thread_id": "123"}')
     assert result["message"] == "Xin chào"
@@ -88,7 +88,7 @@ File `conftest.py` chứa pytest fixtures — các hàm setup/teardown được 
 import pytest
 import asyncio
 from httpx import AsyncClient, ASGITransport
-from app.main import app
+from src.main import app
 
 
 @pytest.fixture(scope="session")
@@ -192,7 +192,7 @@ async def test_chat_success(client, sample_chat_request):
     # Mock agent.arun để không gọi LLM thật
     mock_response = "Việt Nam có 63 tỉnh thành phố trực thuộc trung ương."
 
-    with patch("app.agent.graph.agent") as mock_agent:
+    with patch("src.agents.graph.agent") as mock_agent:
         mock_agent.arun = AsyncMock(return_value=mock_response)
 
         response = await client.post(
@@ -245,7 +245,7 @@ async def test_chat_long_message(client):
 @pytest.mark.asyncio
 async def test_chat_llm_error(client, sample_chat_request):
     """Test POST /api/v1/chat khi LLM bị lỗi."""
-    with patch("app.agent.graph.agent") as mock_agent:
+    with patch("src.agents.graph.agent") as mock_agent:
         mock_agent.arun = AsyncMock(
             side_effect=Exception("LLM API timeout")
         )
@@ -278,7 +278,7 @@ pytest tests/test_api_chat.py -v
 pytest tests/test_api_chat.py::test_chat_success -v
 
 # Chạy với coverage
-pytest tests/ -v --cov=app --cov-report=term-missing
+pytest tests/ -v --cov=src --cov-report=term-missing
 
 # Chạy và in print statements
 pytest tests/ -v -s
@@ -300,7 +300,7 @@ from unittest.mock import AsyncMock, patch
 
 def test_parse_user_query():
     """Unit test: test node parse_user_query."""
-    from app.agent.nodes import parse_user_query
+    from src.agents.nodes import parse_user_query
 
     state = {"messages": [{"role": "user", "content": "Giá vàng hôm nay?"}]}
     result = parse_user_query(state)
@@ -312,7 +312,7 @@ def test_parse_user_query():
 
 def test_format_response():
     """Unit test: test node format_response."""
-    from app.agent.nodes import format_response
+    from src.agents.nodes import format_response
 
     state = {
         "raw_answer": "Giá vàng 18K hôm nay là 5.2 triệu/lượng.",
@@ -328,14 +328,14 @@ def test_format_response():
 @pytest.mark.asyncio
 async def test_retrieve_documents():
     """Unit test: test node retrieve_documents với mock vector store."""
-    from app.agent.nodes import retrieve_documents
+    from src.agents.nodes import retrieve_documents
 
     mock_docs = [
         {"content": "Giá vàng SJC 5.2 triệu", "score": 0.95},
         {"content": "Giá vàng 18K 4.8 triệu", "score": 0.88},
     ]
 
-    with patch("app.agent.nodes.vector_store") as mock_vs:
+    with patch("src.agents.nodes.vector_store") as mock_vs:
         mock_vs.similarity_search = AsyncMock(return_value=mock_docs)
 
         state = {"parsed_query": {"entity": "vàng", "intent": "price_query"}}
@@ -358,12 +358,12 @@ from unittest.mock import AsyncMock, patch, MagicMock
 @pytest.mark.asyncio
 async def test_graph_simple_query_flow():
     """Integration test: test graph flow cho câu hỏi đơn giản."""
-    from app.agent.graph import build_graph
+    from src.agents.graph import build_graph
 
     graph = build_graph()
 
     # Mock tất cả LLM calls
-    with patch("app.agent.nodes.llm") as mock_llm:
+    with patch("src.agents.nodes.llm") as mock_llm:
         mock_llm.ainvoke = AsyncMock(
             return_value=MagicMock(
                 content='{"intent": "simple_query", "entity": "vàng"}'
@@ -371,7 +371,7 @@ async def test_graph_simple_query_flow():
         )
 
         # Mock retrieve
-        with patch("app.agent.nodes.vector_store") as mock_vs:
+        with patch("src.agents.nodes.vector_store") as mock_vs:
             mock_vs.similarity_search = AsyncMock(
                 return_value=[{"content": "Gold price data", "score": 0.9}]
             )
@@ -388,7 +388,7 @@ async def test_graph_simple_query_flow():
 @pytest.mark.asyncio
 async def test_graph_conditional_routing():
     """Test: graph route đúng cho các loại query khác nhau."""
-    from app.agent.graph import build_graph, should_retrieve
+    from src.agents.graph import build_graph, should_retrieve
 
     # Query cần retrieval
     state_retrieve = {"parsed_query": {"intent": "price_query"}}
@@ -402,7 +402,7 @@ async def test_graph_conditional_routing():
 @pytest.mark.asyncio
 async def test_graph_handles_empty_input():
     """Test: graph xử lý input rỗng gracefully."""
-    from app.agent.graph import build_graph
+    from src.agents.graph import build_graph
 
     graph = build_graph()
 
@@ -418,13 +418,13 @@ async def test_graph_handles_empty_input():
 @pytest.mark.asyncio
 async def test_graph_preserves_thread_history():
     """Test: graph duy trì lịch sử hội thoại."""
-    from app.agent.graph import build_graph
+    from src.agents.graph import build_graph
 
     graph = build_graph()
     thread_id = "test-thread-history"
 
     # Message 1
-    with patch("app.agent.nodes.llm") as mock_llm:
+    with patch("src.agents.nodes.llm") as mock_llm:
         mock_llm.ainvoke = AsyncMock(
             return_value=MagicMock(content="Việt Nam ở Đông Nam Á.")
         )
@@ -439,7 +439,7 @@ async def test_graph_preserves_thread_history():
         )
 
     # Message 2 — nên nhớ context từ message 1
-    with patch("app.agent.nodes.llm") as mock_llm:
+    with patch("src.agents.nodes.llm") as mock_llm:
         mock_llm.ainvoke = AsyncMock(
             return_value=MagicMock(
                 content="Thủ đô của Việt Nam là Hà Nội."
@@ -467,7 +467,7 @@ Conditional routing là logic quan trọng nhất trong LangGraph — nó quyế
 ```python
 # tests/test_routing.py
 import pytest
-from app.agent.routing import should_retrieve, classify_intent
+from src.agents.routing import should_retrieve, classify_intent
 
 
 class TestShouldRetrieve:
@@ -519,13 +519,13 @@ Code coverage đo tỷ lệ phần trăm code được thực thi khi chạy tes
 pip install pytest-cov
 
 # Chạy tests với coverage report
-pytest tests/ --cov=app --cov-report=term-missing
+pytest tests/ --cov=src --cov-report=term-missing
 
 # Tạo HTML report (mở htmlcov/index.html trong browser)
-pytest tests/ --cov=app --cov-report=html
+pytest tests/ --cov=src --cov-report=html
 
 # Đặt minimum coverage threshold
-pytest tests/ --cov=app --cov-fail-under=60
+pytest tests/ --cov=src --cov-fail-under=60
 ```
 
 Output terminal sẽ hiển thị bảng coverage:
@@ -533,15 +533,15 @@ Output terminal sẽ hiển thị bảng coverage:
 ```
 Name                           Stmts   Miss  Cover   Missing
 -------------------------------------------------------------
-app/__init__.py                    0      0   100%
-app/main.py                       25      3    88%   45-47
-app/api/__init__.py                0      0   100%
-app/api/health.py                  8      0   100%
-app/api/chat.py                   35     12    66%   23-28, 41-46
-app/agent/__init__.py              0      0   100%
-app/agent/graph.py                45     18    60%   34-52, 67-71
-app/agent/nodes.py                30      5    83%   15, 28-30
-app/agent/routing.py              12      0   100%
+src/__init__.py                    0      0   100%
+src/main.py                       25      3    88%   45-47
+src/api/__init__.py                0      0   100%
+src/api/health.py                  8      0   100%
+src/api/chat.py                   35     12    66%   23-28, 41-46
+src/agents/__init__.py              0      0   100%
+src/agents/graph.py                45     18    60%   34-52, 67-71
+src/agents/nodes.py                30      5    83%   15, 28-30
+src/agents/routing.py              12      0   100%
 -------------------------------------------------------------
 TOTAL                            155     38    75%
 ```
@@ -560,32 +560,32 @@ Cột "Missing" cho biết dòng nào chưa được test覆盖 — tập trung 
 | Configuration | 50%+ | Ít logic, ít priority |
 | **Tổng thể** | **60%+** | **Mục tiêu tối thiểu** |
 
-### Cấu hình coverage trong `pyproject.toml`
+### Cấu hình coverage trong `pytest.ini`
 
-```toml
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-asyncio_mode = "auto"
-addopts = "-v --cov=app --cov-report=term-missing --cov-fail-under=60"
+Template không có `pyproject.toml`, nên cấu hình này đi vào một file `pytest.ini` mới ở thư mục gốc dự án — pytest tự nhận file này mà không cần khai báo gì thêm ở nơi khác:
 
-[tool.coverage.run]
-source = ["app"]
-omit = [
-    "app/__init__.py",
-    "*/tests/*",
-    "*/migrations/*",
-]
+```ini
+[pytest]
+testpaths = tests
+asyncio_mode = auto
+addopts = -v --cov=src --cov-report=term-missing --cov-fail-under=60
 
-[tool.coverage.report]
-exclude_lines = [
-    "pragma: no cover",
-    "if __name__ == .__main__.:",
-    "raise NotImplementedError",
-    "pass",
-]
+[coverage:run]
+source = src
+omit =
+    src/__init__.py
+    */tests/*
+    */migrations/*
+
+[coverage:report]
+exclude_lines =
+    pragma: no cover
+    if __name__ == .__main__.:
+    raise NotImplementedError
+    pass
 ```
 
-Với cấu hình này, chỉ cần chạy `pytest` không cần thêm flag nào — nó tự động chạy coverage và fail nếu dưới 60%.
+Với file này, chỉ cần chạy `pytest` không cần thêm flag nào — nó tự động chạy coverage và fail nếu dưới 60%. Cần cài `pytest-cov` trước (`pip install pytest-cov` — chưa có sẵn trong `requirements.txt`).
 
 > ⚠️ **LƯU Ý:** Không cố gắng đạt 100% coverage bằng cách viết test "rác" — test chỉ gọi code mà không assert gì. Coverage cao + test chất lượng thấp tệ hơn coverage thấp + test chất lượng cao. Tập trung vào happy path, error path, và edge cases.
 
@@ -875,7 +875,7 @@ Trong chương này, chúng ta đã tìm hiểu về kiểm thử và đánh gi�
 - **Testing pyramid:** Unit tests (70-80%), Integration tests (15-20%), Evaluation tests (5-10%)
 - **API testing:** pytest + AsyncClient + conftest.py fixtures, test GET/POST endpoints, validation, errors
 - **Agent testing:** Test từng node riêng lẻ, test conditional routing, test graph flow end-to-end
-- **Code coverage:** pytest-cov, mục tiêu 60%+, cấu hình trong pyproject.toml
+- **Code coverage:** pytest-cov, mục tiêu 60%+, cấu hình trong pytest.ini
 - **Evaluation Evidence:** Cấu trúc báo cáo, metrics table, user feedback, code traceability
 - **RAGAS metrics:** Faithfulness, Answer Relevancy, Context Precision, Context Recall
 
