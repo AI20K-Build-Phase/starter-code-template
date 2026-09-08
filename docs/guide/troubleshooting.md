@@ -25,7 +25,7 @@ which python
 source .venv/bin/activate
 
 # 3. Cài lại package
-pip install -e ".[dev]"
+pip install -r requirements.txt
 ```
 
 **Nếu vẫn lỗi:**
@@ -34,7 +34,7 @@ pip install -e ".[dev]"
 rm -rf .venv
 python3.11 -m venv .venv
 source .venv/bin/activate
-pip install -e ".[dev]"
+pip install -r requirements.txt
 ```
 
 ### `python3.11: command not found`
@@ -57,9 +57,9 @@ sudo apt install python3.11 python3.11-venv python3.11-dev
 
 **Cách sửa:** Dùng mirror gần Việt Nam:
 ```bash
-pip install -e ".[dev]" -i https://pypi.tuna.tsinghua.edu.cn/simple
+pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 # Hoặc
-pip install -e ".[dev]" -i https://mirror.cloudflare.com/pypi/simple
+pip install -r requirements.txt -i https://mirror.cloudflare.com/pypi/simple
 ```
 
 ### `ERROR: Could not build wheel for xxx`
@@ -313,4 +313,4 @@ app.add_middleware(
 2. **Google lỗi** — Copy paste error message vào Google, thường có giải pháp trên StackOverflow
 3. **Check `.env`** — 80% lỗi production do biến môi trường thiếu hoặc sai
 4. **Chạy `make check`** — Lint + format + typecheck + test trong một lệnh
-5. **Xóa và tạo lại** — `rm -rf .venv && python3.11 -m venv .venv && source .venv/bin/activate && pip install -e ".[dev]"`
+5. **Xóa và tạo lại** — `rm -rf .venv && python3.11 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt`

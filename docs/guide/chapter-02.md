@@ -76,7 +76,8 @@ Sau khi clone, hãy mở thư mục dự án trong editor (khuyến nghị VS Co
 ├── .gitignore           # Git ignore rules
 ├── Dockerfile           # Container definition
 ├── docker-compose.yml   # Multi-container orchestration
-├── pyproject.toml       # Project metadata & dependencies
+├── requirements.txt     # Danh sách dependencies
+├── ruff.toml            # Cấu hình linter/formatter
 ├── Makefile             # Common commands shortcut
 └── README.md            # Project documentation
 ```
@@ -152,25 +153,20 @@ Sau khi kích hoạt, bạn sẽ thấy tên venv hiển thị ở đầu comman
 
 ### Cài đặt dependencies
 
-Template sử dụng file `pyproject.toml` để quản lý dependencies — đây là chuẩn hiện đại của Python, thay thế cho `requirements.txt` truyền thống. Các dependencies được chia thành nhiều nhóm:
+Template khai báo dependencies trong `requirements.txt` — cả thư viện chạy thật lẫn thư viện dùng để test và lint đều nằm trong một file, cài bằng một lệnh:
 
 ```bash
-# Cài tất cả dependencies (development + production)
-$ pip install -e ".[dev]"
-
-# Hoặc nếu lệnh trên không hoạt động, cài từng bước:
-$ pip install -e .
-$ pip install -e ".[dev]"
+$ pip install -r requirements.txt
 ```
 
-Flag `-e` (editable) có nghĩa là bạn cài package ở chế độ "có thể chỉnh sửa" — khi bạn sửa code trong `src/`, thay đổi sẽ phản ánh ngay lập tức mà không cần cài lại. `[dev]` chỉ định cài thêm các thư viện dùng cho development (testing, linting, formatting).
+Không có bước `pip install -e .` như nhiều dự án Python khác: template không đóng gói `src/` thành package để cài, code chạy thẳng từ thư mục dự án (`uvicorn src.main:app`). Nghĩa là bạn sửa code trong `src/` thì lần chạy sau đã dùng bản mới, không cần cài lại gì.
 
 Các dependencies chính trong template bao gồm:
 
 - **`fastapi`** — Framework web backend, async, auto-docs.
 - **`uvicorn`** — ASGI server để chạy FastAPI.
 - **`langgraph`** — Framework xây dựng AI Agent dạng state machine.
-- **`langchain-core`** — Thư viện cốt lõi của LangChain ecosystem.
+- **`langchain`** — Thư viện cốt lõi của LangChain ecosystem.
 - **`langchain-openai`** — Tích hợp với OpenAI models (GPT-4, GPT-3.5).
 - **`pydantic`** và **`pydantic-settings`** — Data validation và settings management.
 - **`python-dotenv`** — Load biến môi trường từ file `.env`.
@@ -179,8 +175,10 @@ Development dependencies:
 
 - **`pytest`** và **`pytest-asyncio`** — Testing framework với hỗ trợ async.
 - **`ruff`** — Linter và formatter thay thế cho flake8 + black, nhanh hơn 10-100x.
-- **`mypy`** — Static type checker.
+- **`mypy`** — Static type checker. Không có trong `requirements.txt`; muốn chạy `make typecheck` thì cài thêm: `pip install mypy`.
 - **`httpx`** — HTTP client dùng cho testing API.
+
+Cuối file còn vài dependency để sẵn dạng comment — SQLAlchemy, Alembic, psycopg2 cho database, ChromaDB cho vector store. Đội nào cần thì bỏ dấu `#` rồi cài lại, không cần tự đi tra phiên bản.
 
 ### Xác nhận cài đặt thành công
 
@@ -486,20 +484,18 @@ Bây giờ bạn đã có template chạy được trên máy. Nhưng template c
 
 ### Những gì cần thay đổi ngay
 
-**1. Cập nhật `pyproject.toml`:**
+**1. Rà lại `requirements.txt`:** bỏ dấu `#` ở những dependency đội thật sự dùng, và thêm thư viện mới vào đây thay vì cài lẻ trên máy — CI dựng môi trường từ đầu bằng đúng file này, thư viện không được khai báo thì chạy trên máy bạn được nhưng hỏng trên CI.
 
-```toml
-[project]
-name = "team-alpha-agent"          # Tên dự án của bạn
-version = "0.1.0"
-description = "AI Agent cho [mô tả use case]"  # Mô tả ngắn gọn
-authors = [
-    {name = "Team Alpha"},
-]
-
-[project.urls]
-repository = "https://github.com/<ORG-CỦA-KHOÁ>/<MÃ-ĐỘI>"  # URL repo của đội bạn
 ```
+# Database — bỏ comment nếu đội dùng
+sqlalchemy>=2.0.0
+alembic>=1.14.0
+
+# Vector Store — bỏ comment nếu đội làm RAG
+chromadb>=0.5.0
+```
+
+Luôn ghi kèm ràng buộc phiên bản (`>=`), đừng để tên trần: một bản release mới của thư viện có thể làm hỏng build mà không ai đụng vào code.
 
 **2. Cập nhật `README.md`:** Template có README placeholder. Thay thế bằng nội dung thực tế:
 
@@ -518,7 +514,7 @@ Agent tự động phân tích sentiment của bài đăng mạng xã hội và 
 ```bash
 python3.11 -m venv .venv
 source .venv/bin/activate
-pip install -e ".[dev]"
+pip install -r requirements.txt
 cp .env.example .env  # Điền API key
 make run
 ```
@@ -538,8 +534,8 @@ OPENAI_API_KEY=sk-proj-xxxxxxxxxxxxx
 - **Cấu trúc thư mục** — Đừng tái cấu trúc trừ khi có lý do rất tốt. Cấu trúc đã được thiết kế theo best practices.
 - **Git workflow** — Branching strategy và commit message format.
 - **CI/CD configuration** — Nếu template có sẵn file GitHub Actions, giữ nguyên và chỉ chỉnh sửa khi cần.
-- **Testing setup** — `pytest.ini` hoặc cấu hình pytest trong `pyproject.toml`.
-- **Linting configuration** — Cấu hình `ruff` trong `pyproject.toml`.
+- **Testing setup** — thư mục `tests/` và cách `pytest` được gọi trong `Makefile` lẫn CI.
+- **Linting configuration** — cấu hình `ruff` trong `ruff.toml`.
 
 ### Kế hoạch hành động cho tuần đầu tiên
 
