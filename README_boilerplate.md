@@ -35,8 +35,8 @@ Sản phẩm giải quyết vấn đề như thế nào bằng AI:
 
 ```bash
 # 1. Clone repo
-git clone https://github.com/a20-ai-thuc-chien/A20-App-XXX.git
-cd A20-App-XXX
+git clone https://github.com/<ORG-CỦA-KHOÁ>/<MÃ-ĐỘI>.git
+cd <MÃ-ĐỘI>
 
 # 2. Setup environment
 cp .env.example .env

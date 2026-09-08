@@ -1,14 +1,12 @@
 ---
-title: "Cohort 1 Mistakes"
-description: "Phân tích lỗi từ 12 teams Cohort 1"
+title: "Lỗi thường gặp"
+description: "Những sai lầm khiến đội mất điểm và cách tránh"
 weight: 1
 ---
 
-## Top 10 Mistakes (Cohort 1)
+## 10 lỗi làm mất điểm nhiều nhất
 
-Phân tích từ 12 teams, đây là những lỗi phổ biến nhất:
-
-### 1. Bare except — 3/12 teams
+### 1. Bare except
 
 ```python
 # ❌ Lỗi: Che mọi lỗi, không biết gì fail
@@ -25,7 +23,7 @@ except ValueError as e:
     return {"error": str(e)}
 ```
 
-### 2. Hardcoded Secrets — 1/12 teams
+### 2. Hardcoded Secrets
 
 ```python
 # ❌ API key lộ trong code
@@ -37,14 +35,13 @@ settings = get_settings()
 client = OpenAI(api_key=settings.openai_api_key)
 ```
 
-### 3. No Tests — Hầu hết teams
+### 3. No Tests
 
 ```python
-# Chỉ 2/12 teams có tests
-# Template đã có sẵn test structure — chỉ cần viết thêm
+# Template đã có sẵn test structure trong tests/ — chỉ cần viết thêm
 ```
 
-### 4. No CI/CD — 0/12 teams
+### 4. No CI/CD
 
 ```yaml
 # Template đã có .github/workflows/ci.yml
@@ -70,38 +67,31 @@ async def transform(result: dict) -> dict:
 
 ### 6. Không có Architecture Diagram
 
-- 5/12 teams thiếu diagram
 - BTC chấm System Design thấp → mất 2-3 points
+- Template có sẵn `docs/architecture_diagram.md` để điền vào
 
 ### 7. README thiếu
 
-- 6/12 teams README kém
 - Thiếu: problem statement, tech stack, setup guide
+- Dùng `README_boilerplate.md` làm khung, đừng viết lại từ đầu
 
 ### 8. Không có Evaluation Evidence
 
-- Chỉ 2/12 teams có
 - BTC không thấy bằng chứng testing → điểm thấp
+- Kết quả đo đạc để ở `eval/`, kèm số liệu và cách chạy lại
 
 ### 9. Tất cả code trong 1 file
 
-- 4/12 teams có main.py > 500 lines
-- Khó maintain, khó test, khó review
+- `main.py` vài trăm dòng thì khó maintain, khó test, khó review
+- Template đã tách sẵn `agents/`, `api/`, `services/`, `models/`
 
 ### 10. Không type hints
 
 - Code quality giảm → mất 1-2 points
 
-## Common Weaknesses by Score
+## Bắt đầu từ đâu
 
-### Bottom Tier (27-30 points)
-
-| Team | Score | Main Issues |
-|------|-------|------------|
-| 004 | 27.9 | System design 2.5, DevOps 1.5 |
-| 006 | 28.8 | Code quality 4.1, System 6.0 |
-| 012 | 28.9 | Product 4.8, DevOps 3.8 |
-| 011 | 29.3 | DevOps 2.0, bare except |
-| 001 | 32.0 | Code quality 3.3 |
-
-### Pattern chung: DevOps + Code Quality = điểm thấp nhất
+Bốn lỗi đầu có thể xử lý gọn trong một buổi, vì template đã dựng sẵn hạ tầng cho
+chúng: `.env.example` cho secrets, `tests/` cho pytest, `ruff.toml` cho lint và
+`.github/workflows/ci.yml` cho CI. Phần lớn việc còn lại chỉ là dùng chúng thay
+vì bỏ trống.

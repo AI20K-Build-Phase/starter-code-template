@@ -63,7 +63,7 @@ Nếu bạn chưa vững Python, hãy hoàn thành khóa "AI Python for Beginner
 
 | Tuần | Nội dung | Chương | Thời gian |
 |------|----------|--------|-----------|
-| 1 | Clone template, setup môi trường, git workflow | 1-2 | 4h |
+| 1 | Clone repo của đội, setup môi trường, git workflow | 1-2 | 4h |
 | 2 | Thiết kế kiến trúc, vẽ diagram | 3 | 6h |
 | 3 | Xây dựng AI Agent với LangGraph | 4 | 8h |
 | 4 | Phát triển API + Giao diện | 5-6 | 8h |
