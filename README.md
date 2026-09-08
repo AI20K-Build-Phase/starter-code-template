@@ -58,9 +58,10 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
-Mở `.env` và điền `OPENAI_API_KEY`. Riêng `AI_LOG_API_KEY` phải thay bằng key của
-đội lấy từ link mời của BTC — giá trị trong `.env.example` chỉ là placeholder,
-để nguyên thì log không vào được hệ thống chấm.
+Mở `.env` và điền `OPENAI_API_KEY`. Riêng `AI_LOG_API_KEY`, mỗi thành viên tự
+tạo key riêng tại [dashboard Phoenix](https://phoenix.note.transformerlabs.ai/api-keys)
+rồi thay vào chỗ `<get-your-api-key-from-dashboard-phoenix>` — giá trị trong
+`.env.example` chỉ là placeholder, để nguyên thì log không vào được hệ thống chấm.
 
 ### 4. Cài hook ghi log AI
 
