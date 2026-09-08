@@ -9,11 +9,17 @@ Logging prompt vào `.ai-log/session.jsonl` đã được **tự động hoá ho
 
 ## Cơ chế
 
-Khi student `git push`:
-1. Pre-push hook chạy `scripts/log_antigravity.py --auto`, đọc trực tiếp transcript của các conversation Antigravity từ `~/.gemini/antigravity-ide/brain/<conv>/.system_generated/logs/transcript.jsonl` và sweep mọi prompt (`USER_INPUT` + `USER_EXPLICIT`) thuộc về repo hiện tại trong 24 giờ gần nhất.
+**Trong lúc code** — Antigravity 2.0 đã hỗ trợ hooks. `.agents/hooks.json` đăng ký một hook `PreInvocation` (chạy mỗi lượt user gửi prompt) gọi `scripts/log_antigravity.py --hook`. Antigravity truyền `transcriptPath` của conversation hiện tại qua stdin, script đọc đúng file đó và append mọi prompt (`USER_INPUT` + `USER_EXPLICIT`) chưa có trong `.ai-log/session.jsonl`.
+
+**Khi `git push`:**
+1. Pre-push hook chạy `scripts/log_antigravity.py --auto` — quét lại `~/.gemini/antigravity-ide/brain/<conv>/.system_generated/logs/transcript.jsonl` trong 24 giờ gần nhất. Đây là lưới an toàn: nó vét nốt prompt của lượt cuối cùng (hook `PreInvocation` chưa kịp chạy sau lượt đó) và vẫn hoạt động với Antigravity 1.x không có hooks.
 2. Pre-push hook chạy `scripts/submit_log.py`, đẩy `.ai-log/session.jsonl` lên grading server.
 
+Hai đường này khử trùng lặp bằng `entry_id`, chạy chồng nhau cũng không tạo entry trùng.
+
 Toàn bộ prompt user đã gõ trong Antigravity IDE được capture **nguyên văn từ disk**, không cần AI tự tóm tắt.
+
+> Lần đầu mở workspace, Antigravity sẽ hỏi có tin tưởng hook `log-prompt` không — phải bấm đồng ý, nếu không hook sẽ không chạy (chỉ còn lưới an toàn lúc push).
 
 ## Không làm những việc sau
 

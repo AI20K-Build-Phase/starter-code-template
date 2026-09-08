@@ -20,6 +20,15 @@ Why not other sources we considered?
   - ~/.gemini/tmp/<slug>/chats/session-*.json is the Gemini CLI, not the
     Antigravity IDE.
 
+Two ways in
+-----------
+--hook  Antigravity 2.0 fires this from `.agents/hooks.json` on PreInvocation
+        and hands us the payload on stdin. Its `transcriptPath` points straight
+        at the current conversation, so this mode needs none of the brain
+        scanning or repo guessing described below.
+--auto  Pre-push sweep, and the only mode Antigravity 1.x can use. It has to
+        locate the transcripts itself — see "Conversation → repo mapping".
+
 Conversation → repo mapping
 ---------------------------
 The brain folder has no .project_root file. We map a conv to the current repo
@@ -28,6 +37,7 @@ belonging to this repo when one of its Cwd values either equals, is an
 ancestor of, or is a descendant of the current repo root.
 
 Usage:
+  python scripts/log_antigravity.py --hook            # hook mode, payload on stdin
   python scripts/log_antigravity.py --auto            # default: last 24h
   python scripts/log_antigravity.py --hours 72
   python scripts/log_antigravity.py --all             # every conv, no cutoff
@@ -73,13 +83,33 @@ AUX_BLOCK_RE = re.compile(
 )
 
 
-def git(cmd: str) -> str:
+def git(cmd: str, cwd: Path | None = None) -> str:
     try:
         return subprocess.check_output(
-            cmd.split(), shell=False, text=True, stderr=subprocess.DEVNULL
+            cmd.split(), shell=False, text=True, stderr=subprocess.DEVNULL,
+            cwd=cwd,
         ).strip()
     except Exception:
         return ""
+
+
+def repo_context(cwd: Path | None = None) -> tuple[str, str, str, str]:
+    """(repo, branch, commit, student) read from the git tree at `cwd`.
+
+    Hook mode passes the workspace root explicitly: the hook process does not
+    necessarily start inside the student's repo.
+    """
+    root = cwd or Path.cwd()
+    repo = git("git remote get-url origin", cwd).rstrip("/").split("/")[-1]
+    if repo.endswith(".git"):
+        repo = repo[:-4]
+    return (
+        repo or root.name,
+        git("git rev-parse --abbrev-ref HEAD", cwd),
+        git("git rev-parse --short HEAD", cwd),
+        git("git config user.email", cwd)
+        or os.environ.get("USERNAME", os.environ.get("USER", "unknown")),
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -202,6 +232,43 @@ def get_logged_entry_ids(log_file: Path) -> set[str]:
 # Iterating user inputs
 # ---------------------------------------------------------------------------
 
+def iter_transcript_inputs(transcript: Path, conv_id: str,
+                           cutoff: datetime | None):
+    """Yield the user-typed prompts recorded in one transcript.jsonl."""
+    with open(transcript, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                entry = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if (entry.get("type") != "USER_INPUT"
+                    or entry.get("source") != "USER_EXPLICIT"):
+                continue
+
+            ts = entry.get("created_at") or ""
+            if cutoff and ts:
+                try:
+                    ts_dt = datetime.fromisoformat(ts.replace("Z", "+00:00"))
+                    if ts_dt < cutoff:
+                        continue
+                except ValueError:
+                    pass
+
+            text = extract_user_prompt(entry.get("content", ""))
+            if len(text) < 2:
+                continue
+
+            yield {
+                "conv_id": conv_id,
+                "step_index": int(entry.get("step_index", 0)),
+                "timestamp": ts,
+                "text": text,
+            }
+
+
 def iter_user_inputs(brain_dirs: list[Path], cutoff: datetime | None,
                      only_conv: str | None, repo_root_n: str):
     """Yield user-input dicts from every matching conversation transcript."""
@@ -222,40 +289,8 @@ def iter_user_inputs(brain_dirs: list[Path], cutoff: datetime | None,
             if repo_root_n and not _conv_matches_repo(cwds, repo_root_n):
                 continue
 
-            with open(transcript, encoding="utf-8") as f:
-                for line in f:
-                    line = line.strip()
-                    if not line:
-                        continue
-                    try:
-                        entry = json.loads(line)
-                    except json.JSONDecodeError:
-                        continue
-                    if (entry.get("type") != "USER_INPUT"
-                            or entry.get("source") != "USER_EXPLICIT"):
-                        continue
-
-                    ts = entry.get("created_at") or ""
-                    if cutoff and ts:
-                        try:
-                            ts_dt = datetime.fromisoformat(
-                                ts.replace("Z", "+00:00")
-                            )
-                            if ts_dt < cutoff:
-                                continue
-                        except ValueError:
-                            pass
-
-                    text = extract_user_prompt(entry.get("content", ""))
-                    if len(text) < 2:
-                        continue
-
-                    yield {
-                        "conv_id": conv_dir.name,
-                        "step_index": int(entry.get("step_index", 0)),
-                        "timestamp": ts,
-                        "text": text,
-                    }
+            yield from iter_transcript_inputs(transcript, conv_dir.name,
+                                              cutoff)
 
 
 # ---------------------------------------------------------------------------
@@ -263,7 +298,7 @@ def iter_user_inputs(brain_dirs: list[Path], cutoff: datetime | None,
 # ---------------------------------------------------------------------------
 
 def build_entry(msg: dict, repo: str, branch: str, commit: str,
-                student: str) -> dict:
+                student: str, model: str = "gemini") -> dict:
     ts = msg["timestamp"]
     if ts.endswith("Z"):
         try:
@@ -281,7 +316,7 @@ def build_entry(msg: dict, repo: str, branch: str, commit: str,
         "event": "UserPrompt",
         "entry_id": f"antigravity-{msg['conv_id']}-{msg['step_index']:05d}",
         "session_id": msg["conv_id"],
-        "model": "gemini",
+        "model": model,
         "repo": repo,
         "branch": branch,
         "commit": commit,
@@ -291,11 +326,100 @@ def build_entry(msg: dict, repo: str, branch: str, commit: str,
     }
 
 
+# ---------------------------------------------------------------------------
+# Antigravity 2.0 hook mode
+# ---------------------------------------------------------------------------
+
+def transcript_from_payload(data: dict) -> Path | None:
+    """The transcript this hook invocation is about.
+
+    Antigravity gives us `transcriptPath` outright; `conversationId` is only a
+    fallback for payload shapes that leave the path out.
+    """
+    p = data.get("transcriptPath") or ""
+    if p and Path(p).is_file():
+        return Path(p)
+    conv = data.get("conversationId") or ""
+    if conv:
+        for brain in get_brain_dirs():
+            cand = (brain / conv / ".system_generated" / "logs"
+                    / "transcript.jsonl")
+            if cand.is_file():
+                return cand
+    return None
+
+
+def log_from_hook(transcript: Path, data: dict) -> int:
+    """Append every not-yet-logged prompt of this conversation; return how many.
+
+    No time window and no repo filter: the payload already says which
+    conversation and which workspace we are in, and `entry_id` dedup makes a
+    full re-scan idempotent. PreInvocation fires once per user turn, so the
+    prompt of turn N lands at turn N or N+1; whatever the final turn leaves
+    behind is swept up by the pre-push `--auto` run.
+    """
+    conv_id = data.get("conversationId") or transcript.parents[2].name
+    workspaces = [w for w in (data.get("workspacePaths") or []) if w]
+    root = Path(workspaces[0]) if workspaces else Path.cwd()
+
+    log_dir = Path(os.environ.get("AI_LOG_DIR", ".ai-log"))
+    if not log_dir.is_absolute():
+        log_dir = root / log_dir
+    log_dir.mkdir(parents=True, exist_ok=True)
+    log_file = log_dir / "session.jsonl"
+    logged_ids = get_logged_entry_ids(log_file)
+
+    repo, branch, commit, student = repo_context(root)
+    model = data.get("modelName") or "gemini"
+
+    new_entries = [
+        e for e in (
+            build_entry(msg, repo, branch, commit, student, model)
+            for msg in iter_transcript_inputs(transcript, conv_id, None)
+        )
+        if e["entry_id"] not in logged_ids
+    ]
+    if not new_entries:
+        return 0
+
+    with open(log_file, "a", encoding="utf-8") as f:
+        for e in new_entries:
+            f.write(json.dumps(e, ensure_ascii=False) + "\n")
+    return len(new_entries)
+
+
+def hook_mode() -> None:
+    """PreInvocation entry point.
+
+    The contract with Antigravity is: read JSON on stdin, print a JSON object
+    on stdout, exit 0. Anything else surfaces as a hook failure inside the
+    student's IDE, so every step here is allowed to fail silently — a missing
+    log line is a much smaller problem than a broken editor.
+    """
+    try:
+        raw = sys.stdin.buffer.read().decode("utf-8", errors="replace").strip()
+        data = json.loads(raw) if raw else {}
+        if not isinstance(data, dict):
+            data = {}
+        transcript = transcript_from_payload(data)
+        if transcript:
+            n = log_from_hook(transcript, data)
+            if n:
+                print(f"[antigravity-log] Logged {n} prompt(s).",
+                      file=sys.stderr)
+    except Exception:
+        pass
+    print("{}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Extract user prompts from Antigravity IDE transcripts"
                     " into .ai-log/session.jsonl."
     )
+    parser.add_argument("--hook", action="store_true",
+                        help="Antigravity 2.0 hook: read the PreInvocation"
+                             " payload from stdin.")
     parser.add_argument("--auto", action="store_true",
                         help="Default mode: scan recent conversations.")
     parser.add_argument("--hours", type=int, default=24,
@@ -312,6 +436,10 @@ def main() -> None:
     parser.add_argument("summary", nargs="?", help=argparse.SUPPRESS)
     parser.add_argument("model", nargs="?", help=argparse.SUPPRESS)
     args = parser.parse_args()
+
+    if args.hook:
+        hook_mode()
+        return
 
     # Legacy manual mode: `log_antigravity.py "my summary" gemini`
     if args.summary and not (args.auto or args.conv_id or args.all):
@@ -336,16 +464,11 @@ def main() -> None:
 
     repo_root_n = "" if args.no_repo_filter else _normalize(str(Path.cwd()))
 
-    repo = git("git remote get-url origin").split("/")[-1].replace(".git", "")
-    branch = git("git rev-parse --abbrev-ref HEAD")
-    commit = git("git rev-parse --short HEAD")
-    student = git("git config user.email") or os.environ.get(
-        "USERNAME", os.environ.get("USER", "unknown"))
+    repo, branch, commit, student = repo_context()
 
     new_entries: list[dict] = []
     for msg in iter_user_inputs(brain_dirs, cutoff, args.conv_id, repo_root_n):
-        entry = build_entry(msg, repo or Path.cwd().name, branch, commit,
-                            student)
+        entry = build_entry(msg, repo, branch, commit, student)
         if entry["entry_id"] in logged_ids:
             continue
         new_entries.append(entry)
