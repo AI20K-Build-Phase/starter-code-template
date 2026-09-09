@@ -129,7 +129,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1
 
 # Chạy ứng dụng với uvicorn
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
 Giải thích chi tiết từng phần:
@@ -202,7 +202,7 @@ services:
       retries: 3
       start_period: 10s
     volumes:
-      - ./app:/app/app  # Hot reload khi dev
+      - ./src:/app/src  # Hot reload khi dev
     networks:
       - agent-network
     deploy:
@@ -292,7 +292,7 @@ Giải thích các khái niệm chính:
 
 **Resource limits:** `deploy.resources.limits` giới hạn memory và CPU cho mỗi container. Nếu API bị memory leak (rất phổ biến với Python + AI models), nó chỉ dùng tối đa 512MB thay vì chiếm toàn bộ RAM server, ảnh hưởng đến các dịch vụ khác.
 
-> 💡 **MẸO:** Khi phát triển (development), thêm `volumes: - ./app:/app/app` để hot reload — thay đổi code trên máy local sẽ lập tức phản ánh trong container. Khi deploy production, xóa dòng này đi.
+> 💡 **MẸO:** Khi phát triển (development), thêm `volumes: - ./src:/app/src` để hot reload — thay đổi code trên máy local sẽ lập tức phản ánh trong container. Khi deploy production, xóa dòng này đi.
 
 Các lệnh Docker Compose cần biết:
 
@@ -398,7 +398,7 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          pytest tests/ -v --cov=app --cov-report=xml --cov-report=term-missing
+          pytest tests/ -v --cov=src --cov-report=xml --cov-report=term-missing
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
@@ -548,7 +548,7 @@ Monitoring (giám sát) và Logging (ghi log) là hai pilre của vận hành �
 Python có thư viện `logging` tích hợp sẵn, nhưng cấu hình mặc định khá cơ bản. Dưới đây là cấu hình logging production-ready:
 
 ```python
-# app/core/logging_config.py
+# src/core/logging_config.py
 import logging
 import sys
 import json
@@ -676,7 +676,7 @@ Trên LangSmith dashboard, bạn sẽ thấy:
 Health check endpoint là URL mà monitoring tools gọi định kỳ để kiểm tra ứng dụng còn sống và hoạt động đúng:
 
 ```python
-# app/api/health.py
+# src/api/health.py
 from fastapi import APIRouter, Depends
 from datetime import datetime, timezone
 import logging
