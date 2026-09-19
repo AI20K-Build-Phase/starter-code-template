@@ -678,7 +678,7 @@ Template không phải là gông cùm — nó là đường ray. Đường ray k
 
 ## Câu hỏi ôn tập
 
-**Câu 1:** Tại sao chúng ta phải xóa `.git` của template và chạy `git init` lại? Điều gì sẽ xảy ra nếu không làm bước này?
+**Câu 1:** Tại sao sau khi clone repo đội được tạo từ GitHub Template, chúng ta không cần — và không nên — xóa `.git` rồi chạy `git init` lại? Việc xóa `.git` sẽ làm mất những thông tin nào? Bạn nên dùng lệnh nào để kiểm tra repository đang trỏ đúng remote?
 
 **Câu 2:** Giải thích sự khác biệt giữa file `.env.example` và file `.env`. Tại sao file `.env.example` được commit lên Git nhưng file `.env` thì không? Điều gì xảy ra nếu bạn lỡ commit file `.env`?
 
