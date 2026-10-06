@@ -168,7 +168,7 @@ Mọi prompt được ghi vào `.ai-log/session.jsonl` và tự động gửi l�
 |---|---|---|
 | Claude Code | `.claude/settings.json` | mỗi prompt (`UserPromptSubmit`) |
 | Cursor | `.cursor/hooks.json` | mỗi prompt và khi dừng |
-| OpenAI Codex CLI | `.codex/hooks.json` | mỗi prompt và khi dừng |
+| OpenAI Codex CLI | `.codex/hooks.json` | mỗi prompt và khi dừng (hỗ trợ cả Windows qua `commandWindows`) |
 | Gemini CLI | `.gemini/settings.json` | mỗi lượt agent chạy |
 | GitHub Copilot | `.github/hooks/hooks.json` | mỗi prompt và cuối session |
 | Antigravity IDE | `.agents/hooks.json` | mỗi prompt, kèm lần quét lại lúc `git push` |

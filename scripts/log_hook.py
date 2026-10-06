@@ -180,8 +180,15 @@ def main():
     with open(log_file, "a", encoding="utf-8") as f:
         f.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
-    # Output valid JSON (required by some tools like Gemini)
-    print(json.dumps({"status": "logged"}))
+    # Codex `Stop` hooks accept only its lifecycle-output schema.  An arbitrary
+    # status object (for example {"status": "logged"}) is rejected as invalid
+    # stop-hook JSON even though the entry was written successfully.  An empty
+    # object is a valid no-op lifecycle response for both Codex events here.
+    if tool == "codex":
+        print("{}")
+    else:
+        # Output valid JSON (required by some tools like Gemini)
+        print(json.dumps({"status": "logged"}))
 
 
 if __name__ == "__main__":
