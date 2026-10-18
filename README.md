@@ -179,6 +179,77 @@ Dùng ChatGPT hay công cụ web khác thì log thủ công:
 bash scripts/_pyrun.sh scripts/log_manual.py --tool chatgpt --prompt "What you asked"
 ```
 
+### Luồng hoạt động
+
+Log đi qua hai chặng: **ghi** (mỗi khi bạn dùng AI) và **gửi** (mỗi khi bạn `git push`).
+
+```mermaid
+flowchart LR
+    subgraph S1["Chặng 1 · GHI — mỗi khi dùng AI"]
+        A["Công cụ AI<br/>Claude Code, Cursor, Codex,<br/>Gemini CLI, Copilot, Antigravity"]
+        B["Hook trong repo<br/>gọi scripts/log_hook.py"]
+        C[".ai-log/session.jsonl<br/>mỗi event một dòng JSON"]
+        A -- "prompt · gọi tool · kết thúc lượt" --> B
+        B -- "chuẩn hoá, ghi 1 dòng" --> C
+    end
+
+    subgraph S2["Chặng 2 · GỬI — mỗi lần git push"]
+        D["git pre-push hook<br/>(cài bằng setup_hooks)"]
+        E["scripts/submit_log.py<br/>đọc token trong .env<br/>gửi lô 500 dòng"]
+        F[".ai-log/archive/<br/>log đã gửi"]
+        G["Gửi lỗi: giữ lại trong<br/>session.jsonl, gửi lần push sau"]
+        D --> E
+        E -- "thành công" --> F
+        E -- "lỗi mạng / token" --> G
+    end
+
+    subgraph S3["Hệ thống chấm"]
+        H["POST /api/ingest<br/>xác định đội bằng token"]
+        I["Kho log · Dashboard"]
+        H -- "loại bản trùng" --> I
+    end
+
+    C -- "đọc session.jsonl" --> E
+    E -- "Authorization: Bearer &lt;AI_LOG_API_KEY&gt;" --> H
+```
+
+Một số điểm cần nắm:
+
+- Hook chỉ ghi khi repo có remote `origin`; không có `origin` thì event bị bỏ qua
+  (không gắn được với đội nào).
+- Token `AI_LOG_API_KEY` trong `.env` quyết định log thuộc đội nào. Trường `repo`,
+  `student` trong log chỉ để đối chiếu, không dùng để xác định đội.
+- `git push` không bao giờ bị chặn vì lỗi gửi log: log lỗi được giữ lại và gửi lại
+  ở lần push sau.
+
+#### Chuyện gì xảy ra khi push
+
+```mermaid
+sequenceDiagram
+    actor U as Thành viên đội
+    participant P as git pre-push
+    participant S as submit_log.py
+    participant L as .ai-log/
+    participant API as /api/ingest
+
+    U->>P: git push
+    P->>P: log_antigravity.py --auto ghi thêm prompt Antigravity (nếu có)
+    P->>S: chạy submit_log.py
+    S->>L: đổi tên session.jsonl thành session.pending.*.jsonl
+    Note over L: Event mới phát sinh lúc này ghi vào session.jsonl mới,<br/>không lẫn vào lô đang gửi
+    S->>API: POST tối đa 500 dòng, header Authorization: Bearer <AI_LOG_API_KEY>
+    alt Gửi thành công
+        API-->>S: 202 Accepted (accepted, duplicates)
+        S->>L: chép file pending vào archive/YYYY-MM-DD.jsonl, xoá file pending
+        S->>L: quá 500 dòng thì phần dư trả lại session.jsonl
+        Note over L: Phần dư gửi ở lần push sau
+    else Lỗi mạng / 401 / 403
+        S->>L: trả toàn bộ file pending lại session.jsonl
+        Note over L: Lần push sau tự gửi lại
+    end
+    P-->>U: push tiếp tục bình thường (exit 0)
+```
+
 ## Đóng góp
 
 Repo này là open source. Đọc [CONTRIBUTING.md](CONTRIBUTING.md) trước khi mở PR.
