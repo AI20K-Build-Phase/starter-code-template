@@ -613,7 +613,7 @@ Lệnh này cài git pre-push hook và tạo thư mục `.ai-log/`. Sau khi ch�
 |------|--------|-------------|
 | **Claude Code** | `.claude/settings.json` hooks | Mỗi prompt + mỗi tool call |
 | **Cursor** | `.cursor/hooks.json` | Mỗi prompt + khi stop |
-| **OpenAI Codex CLI** | `.codex/hooks.json` | Mỗi prompt + khi stop |
+| **OpenAI Codex CLI** | `.codex/hooks.json` | Mỗi prompt + khi stop (hỗ trợ cả Linux/macOS & Windows) |
 | **Gemini CLI** | `.gemini/settings.json` | BeforeAgent + AfterModel + SessionEnd |
 | **GitHub Copilot** | `.github/hooks/hooks.json` | Mỗi prompt + khi session end |
 | **Antigravity IDE** | Pre-push scan transcript | Tự động quét transcript khi `git push` |
@@ -665,6 +665,7 @@ Copy từ `.env.example` sang `.env` và điền `AI_LOG_API_KEY` do instructor 
 | `python3: not found` | Thiếu Python trên PATH | `brew install python3` (macOS) hoặc cài từ python.org (Windows) |
 | Submit failed | Sai `AI_LOG_API_KEY` hoặc không có network | Kiểm tra `.env`, logs vẫn giữ locally |
 | Antigravity không log | Chưa có transcript | Chắc chắn dùng Antigravity IDE trong repo folder |
+| Codex CLI trên Windows không log | Cần lệnh gọi tương thích CMD/PowerShell | Cấu hình `.codex/hooks.json` đã có sẵn `commandWindows` gọi `cmd /c scripts\pyrun.cmd` |
 
 > ⚠️ **QUAN TRỌNG:** Đừng sửa hoặc xoá file trong `.ai-log/`. Đừng chạy `git push --no-verify` để bypass hook. Nếu hook báo lỗi, báo cho instructor thay vì tự bypass.
 
