@@ -26,7 +26,7 @@ Sản phẩm giải quyết vấn đề như thế nào bằng AI:
 | Layer | Technology |
 |-------|-----------|
 | AI Agent | LangGraph + [LLM] |
-| Backend | FastAPI + Python 3.11+ |
+| Backend | FastAPI + Python 3.12+ |
 | Frontend | React/Next.js + TypeScript |
 | Database | PostgreSQL / SQLite |
 | DevOps | Docker + GitHub Actions |

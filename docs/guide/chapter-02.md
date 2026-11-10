@@ -671,7 +671,7 @@ Copy từ `.env.example` sang `.env` và điền `AI_LOG_API_KEY` do instructor 
 
 ## Tóm tắt
 
-Chương này hướng dẫn bạn khởi tạo dự án từ template — bước đầu tiên và quan trọng nhất. Chúng ta đã đi qua việc clone repository, hiểu cấu trúc thư mục (src/, tests/, docs/, eval/, presentation/), thiết lập môi trường ảo với Python 3.11+, cài đặt dependencies, và chạy server lần đầu tiên.
+Chương này hướng dẫn bạn khởi tạo dự án từ template — bước đầu tiên và quan trọng nhất. Chúng ta đã đi qua việc clone repository, hiểu cấu trúc thư mục (src/, tests/, docs/, eval/, presentation/), thiết lập môi trường ảo với Python 3.12+, cài đặt dependencies, và chạy server lần đầu tiên.
 
 Bạn cũng đã học cách quản lý biến môi trường với pydantic-settings, thiết lập Git workflow với branching strategy và commit message convention, và hiểu được những gì cần tùy chỉnh so với những gì cần giữ nguyên từ template.
 

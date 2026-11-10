@@ -1,6 +1,6 @@
 # Evaluation Report — AI20K Agent Template v2
 
-> Sinh tự động bởi `eval/run_eval.py` lúc 2026-09-18 03:57 UTC. Chạy lại: `make eval`.
+> Sinh tự động bởi `eval/run_eval.py` lúc 2026-11-10 11:28 UTC. Chạy lại: `make eval`.
 
 ## 1. Benchmark Spec
 

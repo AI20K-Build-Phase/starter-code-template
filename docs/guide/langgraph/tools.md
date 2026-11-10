@@ -60,15 +60,36 @@ def call_external_api(endpoint: str, params: dict) -> str:
 ### Calculator Tool
 
 ```python
+import ast
+import operator
+
+from langchain_core.tools import tool
+
+# Whitelist toán tử. Không bao giờ truyền output của LLM vào eval(): nó có thể chạy code tuỳ ý.
+_OPS = {
+    ast.Add: operator.add,
+    ast.Sub: operator.sub,
+    ast.Mult: operator.mul,
+    ast.Div: operator.truediv,
+}
+
+def _eval_node(node: ast.AST) -> float:
+    if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
+        return node.value
+    if isinstance(node, ast.BinOp) and type(node.op) in _OPS:
+        return _OPS[type(node.op)](_eval_node(node.left), _eval_node(node.right))
+    raise ValueError("biểu thức không được hỗ trợ")
+
 @tool
 def calculate(expression: str) -> str:
-    """Tính toán biểu thức toán học."""
+    """Tính biểu thức số học an toàn (không dùng eval)."""
     try:
-        result = eval(expression, {"__builtins__": {}}, {})
-        return str(result)
-    except Exception as e:
+        return str(_eval_node(ast.parse(expression, mode="eval").body))
+    except (SyntaxError, ValueError, ZeroDivisionError) as e:
         return f"Calculation error: {e}"
 ```
+
+> ⚠️ **LƯU Ý:** Không bao giờ gọi `eval()` với input đến từ LLM hoặc người dùng: nó có thể chạy code tuỳ ý, và `{"__builtins__": {}}` không làm nó an toàn. Whitelist AST ở trên chỉ cho phép số và bốn phép toán cơ bản. Bản thật của project là `calculate` trong `src/agents/tools/knowledge.py`.
 
 ## Thêm Tools vào Agent
 

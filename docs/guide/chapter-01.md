@@ -91,25 +91,30 @@ Mỗi chương có cấu trúc thống nhất:
 
 > 💡 **MẸO:** Đừng chỉ đọc — hãy mở terminal lên và code theo. Học bằng cách làm (learning by doing) là cách hiệu quả nhất. Mỗi code block trong sách đều có thể chạy được trực tiếp.
 
-## Tổng quan 10 chương
+## Tổng quan 15 chương
 
 | Chương | Nội dung | Điểm trọng tâm |
 |---------|----------|----------------|
-| 1 | Lời mở đầu (chương này) | Mục tiêu, cách sử dụng |
-| 2 | Khởi tạo dự án | Template, setup, git workflow |
-| 3 | Thiết kế kiến trúc | 3-tier architecture, diagrams, ADR |
-| 4 | LangGraph Agent | State, nodes, edges, tools, RAG |
-| 5 | FastAPI | Routes, validation, error handling |
-| 6 | Giao diện người dùng | Next.js, responsive, streaming |
-| 7 | DevOps | Docker, CI/CD, deploy, logging |
-| 8 | Kiểm thử | Unit test, integration test, RAGAS |
-| 9 | Nộp bài Demo Day | Deliverables, checklist, tips |
-| 10 | Tài nguyên học tập | Courses, docs, BMAD method |
+| 1 | Lời mở đầu (chương này) | Mục tiêu, lộ trình, tiêu chí thắng |
+| 2 | Khởi tạo dự án từ Template | Prototype nhanh hay template chuẩn, git workflow |
+| 3 | Thiết kế kiến trúc hệ thống | Kiến trúc 3 tầng, sơ đồ, ADR |
+| 4 | Xây dựng AI Agent với LangGraph | State, nodes, edges, tools, MCP |
+| 5 | Từ đề bài đến USP | Khảo sát thị trường, positioning |
+| 6 | RAG trong thực tế — từ Naive đến Agentic | Chunking, hybrid search, retrieval |
+| 7 | Workflow Design & Reliability | Edge case, HITL, governance |
+| 8 | Phát triển API với FastAPI | Routes, validation, xử lý lỗi |
+| 9 | Giao diện người dùng | Responsive, streaming |
+| 10 | Kiểm thử và Đánh giá | Unit và integration test, eval harness |
+| 11 | Privacy, Security & AI Governance | Sản phẩm AI đáng tin |
+| 12 | DevOps và Triển khai | Docker, CI/CD, deploy, logging |
+| 13 | Nộp bài Demo Day | Deliverables, rubric, mẹo demo |
+| 14 | Case Studies | Học từ 3 thế hệ đội AI20K |
+| 15 | Tài nguyên học tập | Khóa học, docs, BMAD, Gates G1–G6 |
 
 ## Tóm tắt chương
 
 - Cuốn sách này giúp bạn build AI Agent project đạt chất lượng cao, từ A đến Z
-- 10 chương, 6 tuần, mỗi chương có code examples và bài tập
+- 15 chương, 6 tuần, mỗi chương có code examples và bài tập
 - Sai lầm phổ biến cần tránh: thiếu CI/CD, thiếu test, README kém, không evaluation
 - Học bằng cách làm — mở terminal lên và code theo từng bước
 
