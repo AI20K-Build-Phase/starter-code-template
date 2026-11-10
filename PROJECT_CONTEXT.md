@@ -6,7 +6,7 @@
 ## 0. Quick Rehydrate (≤ 60s)
 
 - **Project**: [TÊN PRODUCT CỦA TEAM] — [1 câu mô tả].
-- **Stack**: Python 3.11 / FastAPI / LangGraph / LangChain / [frontend?].
+- **Stack**: Python 3.12 / FastAPI / LangGraph / LangChain / [frontend?].
 - **Dev**: `uvicorn src.main:app --reload` (backend), `[lệnh frontend]`.
 - **Test**: `make test`. **Eval**: `python eval/run_eval.py`.
 - **Env**: copy `.env.example` → `.env`, thêm `OPENAI_API_KEY` (optional — mock-first).

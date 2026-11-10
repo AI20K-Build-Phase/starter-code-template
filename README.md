@@ -15,7 +15,7 @@ Technical Guidebook: <https://phoenix.note.transformerlabs.ai/technical-book>
 - **Docker và CI** — Dockerfile multi-stage, `docker-compose.yml`, workflow
   GitHub Actions chạy `ruff` + `pytest` khi push lên `main`/`develop` và khi mở
   pull request vào `main`.
-- **Technical Guidebook 10 chương** trong `docs/guide/`, đồng thời đọc được
+- **Technical Guidebook 15 chương** trong `docs/guide/`, đồng thời đọc được
   online.
 - **Checklist 10 deliverables** của Demo Day.
 - **AI usage logging** — hook cài sẵn cho 6 công cụ AI, log tự động gửi lên
@@ -23,7 +23,7 @@ Technical Guidebook: <https://phoenix.note.transformerlabs.ai/technical-book>
 
 ## Yêu cầu
 
-- Python 3.11 (phiên bản CI đang dùng)
+- Python 3.12 (phiên bản CI đang dùng)
 - Git
 - Docker — tuỳ chọn, chỉ cần nếu chạy `docker compose`
 
@@ -47,7 +47,7 @@ của đội thì báo BTC — repo tự tạo nằm ngoài org sẽ không đư
 ### 2. Cài môi trường
 
 ```bash
-python3.11 -m venv .venv
+python3.12 -m venv .venv
 source .venv/bin/activate      # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```

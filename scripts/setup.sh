@@ -6,7 +6,7 @@ set -e
 echo "=== AI20K Project Setup ==="
 
 # Check Python version
-python3 -c "import sys; assert sys.version_info >= (3, 11), 'Python 3.11+ required'"
+python3 -c "import sys; assert sys.version_info >= (3, 12), 'Python 3.12+ required'"
 echo "Python version OK"
 
 # Create virtual environment
